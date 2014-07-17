@@ -25,13 +25,11 @@ function ThreatMeter:FactoryProduce(strFormName, wndParent, tObject)
   
   if wndParent ~= nil and type(wndParent) ~= "string" and tObject ~= nil then
     wndNew = wndParent:FindChildByUserData(tObject)
-    Print("Found object")
   end
   
 	if not wndNew then
     wndNew = DaiGUI:Create(ktFormDefinitions[strFormName]):GetInstance(self, wndParent)
     wndNew:SetData(tObject)
-        Print("Not Found object")
 	end
 	return wndNew
 end
