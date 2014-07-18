@@ -87,12 +87,15 @@ function ThreatMeter:OnInitialize()
   self.tGroupData            = {}
   self.LastMobId             = nil
   self.fLastThreatPct        = 0
+
+
   
   self.wndMain    = self:CreateMainWindow()
   self.wndWarning = self:CreateWarningWindow()
   self.wndItemList = self.wndMain:FindChild("ItemList")
   
   Apollo.LoadSprites("ColorPickerSprites.xml", "ColorPickerSprites")
+  self:UpdateVisibility()
 end
 
 function ThreatMeter:OnEnable()
@@ -182,6 +185,7 @@ end
 function ThreatMeter:UpdateVisibility()
   local bShow = self:ShouldShow()
   self.wndMain:Show(bShow)
+
   self:Warn(bShow)
 
 end
@@ -218,6 +222,8 @@ function ThreatMeter:Warn(bShow)
     end
     if self.db.bWarningUseMessage then
       self.wndWarning:Show(true)
+      self.wndWarning:SetOpacity(self.db.fWarningOpacity / 100)
+      self.wndWarning:SetStyle("Moveable", not self.db.bLockWarningWindow)
     end  
   else
     self.wndWarning:Show(false)

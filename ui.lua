@@ -224,7 +224,7 @@ ktFormDefinitions = {
 
   --
   OptionsForm = {
-    AnchorOffsets = { -254, -340, 254, 368 },
+    AnchorOffsets = { -254, -340, 254, 450 },
     AnchorPoints = "CENTER",
     Name = "OptionsForm1", 
     SwallowMouseClicks = true, 
@@ -235,7 +235,7 @@ ktFormDefinitions = {
       { AnchorPoints = "FILL", Sprite = "BK3:UI_BK3_Holo_Framing_2", },
     },
     Children = {
-      {
+     {
         AnchorOffsets = { -63, 29, -31, 61 },
         AnchorPoints = "TOPRIGHT",
         Class = "Button", 
@@ -584,7 +584,8 @@ ktFormDefinitions = {
         AnchorPoints = "HFILL",
         RelativeToClient = true, 
         Name = "ShowHideFrame", 
-        Children = {
+        Children = 
+        {
           {
             AnchorOffsets = { 58, 0, -19, 25 },
             AnchorPoints = { 0, 0, 0.5, 0 },
@@ -798,14 +799,16 @@ ktFormDefinitions = {
         },
       },
       {
-        AnchorOffsets = { 0, 449, 0, 684 },
+        AnchorOffsets = { 0, 449, 0, 760 },
         AnchorPoints = "HFILL",
         RelativeToClient = true, 
         Name = "WarningsFrame", 
         Pixies = {
-          { AnchorOffsets = { 75, 146, 508, 170 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Threshold %", DT_VCENTER = true, },
+          { AnchorOffsets = { 75, 150, 508, 186 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Threshold %", DT_VCENTER = true, },
+          { AnchorOffsets = { 75, 190, 508, 230 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Opacity %", DT_VCENTER = true, },
         },
-        Children = {
+        Children = 
+        {
           {
             AnchorOffsets = { 60, 27, -60, -25 },
             AnchorPoints = "FILL",
@@ -905,7 +908,30 @@ ktFormDefinitions = {
             },
           },
           {
-            AnchorOffsets = { -400, 167, -75, 198 },
+            AnchorOffsets = { 70, 136, 270, 160 },
+            Class = "Button", 
+            Base = "BK3:btnHolo_Check", 
+            Font = "CRB_InterfaceMedium", 
+            ButtonType = "Check", 
+            DT_VCENTER = true, 
+            Name = "WarningLock", 
+            TextColor = "UI_WindowTextDefault", 
+            NormalTextColor = "UI_BtnTextBlueNormal", 
+            PressedTextColor = "UI_BtnTextBluePressed", 
+            FlybyTextColor = "UI_BtnTextBlueFlyby", 
+            PressedFlybyTextColor = "UI_BtnTextBluePressedFlyby", 
+            DisabledTextColor = "UI_BtnTextBlueDisabled", 
+            Text = "Lock Warning Message", 
+            DrawAsCheckbox = true, 
+            Tooltip = "Lock the Warning Message in its current location", 
+            Events = {
+              ButtonCheck = "OnWarningLock",
+              ButtonUncheck = "OnWarningLock",
+            },
+          },
+
+          {
+            AnchorOffsets = { -400, 176, -75, 208 },
             AnchorPoints = "TOPRIGHT",
             RelativeToClient = true, 
             Name = "WarningThresholdSliderFrame", 
@@ -943,6 +969,54 @@ ktFormDefinitions = {
               },
             },
           },
+
+
+
+
+
+          {
+            AnchorOffsets = { -400, 220, -75, 250 },
+            AnchorPoints = "TOPRIGHT",
+            RelativeToClient = true, 
+            Name = "WarningOpacitySliderFrame", 
+            IgnoreMouse = true, 
+            Children = {
+              {
+                AnchorOffsets = { 0, 7, 0, 27 },
+                AnchorPoints = "HFILL",
+                Class = "SliderBar", 
+                RelativeToClient = true, 
+                Template = "CRB_Scroll_HoloLarge", 
+                Name = "WarningOpacitySlider", 
+                DiscreteTicks = false, 
+                UseButtons = true, 
+                Min = 0.000000, 
+                Max = 100.000000, 
+                TickAmount = 1.000000, 
+                Middle = "CRB_Basekit:kitScrollbase_Horiz_Holo", 
+                Events = {
+                  SliderBarChanged = "OnWarningOpacitySliderBarChanged",
+                },
+              },
+              {
+                AnchorOffsets = { -46, 3, -4, -2 },
+                AnchorPoints = "VFILL",
+                RelativeToClient = true, 
+                Font = "CRB_InterfaceMedium", 
+                Text = 8888, 
+                Template = "CRB_NormalFramedThin", 
+                Name = "WarningOpacityEditBox", 
+                TextColor = "UI_WindowTextDefault", 
+                NoClip = true, 
+                DT_RIGHT = true, 
+                DT_VCENTER = true, 
+              },
+            },
+          },
+
+
+
+
         },
       },
     },
