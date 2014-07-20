@@ -10,7 +10,6 @@ require "GroupLib"
 require "Sound"
 require "MatchingGame"
  
-
 -----------------------------------------------------------------------------------------------
 -- ThreatMeter Module Definitions
 -----------------------------------------------------------------------------------------------
@@ -88,14 +87,12 @@ function ThreatMeter:OnInitialize()
   self.LastMobId             = nil
   self.fLastThreatPct        = 0
 
-
   
   self.wndMain    = self:CreateMainWindow()
   self.wndWarning = self:CreateWarningWindow()
   self.wndItemList = self.wndMain:FindChild("ItemList")
   
   Apollo.LoadSprites("ColorPickerSprites.xml", "ColorPickerSprites")
-  self:UpdateVisibility()
 end
 
 function ThreatMeter:OnEnable()
@@ -126,8 +123,6 @@ function ThreatMeter:OnSaveSettings(eLevel)
   return tData
 end
 
-
-
 --- Addon restore configuration event handler
 -- @param eLevel addon save level
 -- @param tData saved addon configuration data
@@ -155,11 +150,12 @@ function ThreatMeter:OnRestoreSettings(eLevel, tData)
 
   -- merge the settings with the defaults
   DaiUtil.TableMerge(self.db, tData)
+  self:UpdateVisibility()
 end
 
 
 -----------------------------------------------------------------------------------------------
--- ThreatMeter Slash war
+-- ThreatMeter Slash
 -----------------------------------------------------------------------------------------------
 --- General slash command handler
 -- @param cmd
@@ -171,7 +167,6 @@ function ThreatMeter:OnSlashCmd(cmd, args)
 		self.wndMain:Show(true) -- show the window
 	end
 end
-
 
 -----------------------------------------------------------------------------------------------
 -- ThreatMeter Visibility
@@ -185,7 +180,13 @@ end
 function ThreatMeter:UpdateVisibility()
   local bShow = self:ShouldShow()
   self.wndMain:Show(bShow)
-
+  self.wndMain:SetStyle("Moveable", not self.db.bLockMainWindow)
+  self.wndMain:SetOpacity(self.db.fMainWindowOpacity / 100)
+  self.wndMain:FindChild("Scanlines"):SetOpacity(self.db.fArtWorkOpacity / 100)
+  self.wndMain:FindChild("Crack"):SetOpacity(self.db.fArtWorkOpacity / 100)
+  self.wndMain:FindChild("ContainerArt"):SetOpacity(self.db.fArtWorkOpacity / 100)
+  self.wndMain:FindChild("BackgroundArtwork"):SetOpacity(self.db.fArtWorkOpacity / 100)
+  self.wndMain:FindChild("CloseButton"):SetOpacity(self.db.fArtWorkOpacity / 100)
   self:Warn(bShow)
 
 end
@@ -216,15 +217,13 @@ end
 -----------------------------------------------------------------------------------------------
 
 function ThreatMeter:Warn(bShow)
-  if bShow then
+  if bShow and self.db.bWarningUseMessage and not (self.db.bWarningTankDisable and InTankStance()) then
     if self.db.bWarningUseSound then
       Sound.Play(self.db.nWarningSoundId)
     end
-    if self.db.bWarningUseMessage then
       self.wndWarning:Show(true)
       self.wndWarning:SetOpacity(self.db.fWarningOpacity / 100)
-      self.wndWarning:SetStyle("Moveable", not self.db.bLockWarningWindow)
-    end  
+      self.wndWarning:SetStyle("Moveable", not self.db.bLockWarningWindow) 
   else
     self.wndWarning:Show(false)
   end
@@ -281,7 +280,6 @@ function ThreatMeter:AddThreatUnit(tStore, unit, nThreatAmount)
 		return data
 	end
 end
-
 
 function ThreatMeter:ValidateTargetThreatStore()
   local nTargetId = self:GetTargetId()

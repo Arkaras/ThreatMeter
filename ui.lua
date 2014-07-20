@@ -132,11 +132,19 @@ ktFormDefinitions = {
     Sizable = true, 
     Visible = false,
     Pixies = {
-      { AnchorPoints = "FILL", Sprite = "BK3:UI_BK3_Holo_Framing_3", BGColor = "white", TextColor = "black", },
       { AnchorPoints = "BOTTOMRIGHT", AnchorOffsets = {-33, -33, -26, -24}, ResizeHandle=5 },
-
+              
     },
     Children = {
+      {
+        AnchorOffsets = { 0, 0, -1, -1 },
+        AnchorPoints = "FILL",
+        RelativeToClient = true,
+        Name = "BackgroundArtwork",
+         Pixies = {
+              { AnchorPoints = "FILL", Name="BackgroundArtwork", Sprite = "BK3:UI_BK3_Holo_Framing_3", BGColor = "white", TextColor = "black"},
+        }
+      },
       {
         AnchorOffsets = { 36, 25, -51, 51 },
         AnchorPoints = "HFILL",
@@ -221,10 +229,9 @@ ktFormDefinitions = {
     },
   },
 
-
   --
   OptionsForm = {
-    AnchorOffsets = { -254, -340, 254, 450 },
+    AnchorOffsets = { -254, -340, 254, 400 },
     AnchorPoints = "CENTER",
     Name = "OptionsForm1", 
     SwallowMouseClicks = true, 
@@ -251,7 +258,7 @@ ktFormDefinitions = {
         },
       },
       {
-        AnchorOffsets = { 60, 68, -60, 241 },
+        AnchorOffsets = { 60, 68, -60, 340 },
         AnchorPoints = "HFILL",
         Template = "CRB_InnerWindow", 
         Name = "GeneralFrame", 
@@ -259,6 +266,8 @@ ktFormDefinitions = {
         IgnoreMouse = true, 
         Pixies = {
           { AnchorOffsets = { 10, 8, -30, 40 }, AnchorPoints = { 0, 0, 0.5, 0 }, TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_InterfaceMedium", Text = "TPS Window", DT_VCENTER = true, },
+          { AnchorOffsets = { 50, 160, 508, 180 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Main Window Opacity %", DT_VCENTER = true, },
+          { AnchorOffsets = { 50, 195, 508, 225 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Main Window Artwork %", DT_VCENTER = true, },
         },
         Children = {
 					{
@@ -285,20 +294,115 @@ ktFormDefinitions = {
 						},
 					},
           {
+            AnchorOffsets = { 10, 145, 0, 170 },
+            AnchorPoints = "HFILL",
+            Class = "Button", 
+            Base = "BK3:btnHolo_Check", 
+            Font = "CRB_InterfaceMedium", 
+            ButtonType = "Check", 
+            DT_VCENTER = true,
+            Name = "LockWindow", 
+            TextColor = "UI_WindowTextDefault", 
+            NormalTextColor = "UI_BtnTextBlueNormal", 
+            PressedTextColor = "UI_BtnTextBluePressed", 
+            FlybyTextColor = "UI_BtnTextBlueFlyby", 
+            PressedFlybyTextColor = "UI_BtnTextBluePressedFlyby", 
+            DisabledTextColor = "UI_BtnTextBlueDisabled", 
+            Text = "Lock Threat Meter", 
+            DrawAsCheckbox = true, 
+            Tooltip = "Enabling this will increase the precision of the shortened threat totals to 3 decimal places.  When disabled, only 1 decimal place will be used.", 
+            Events = {
+              ButtonCheck = "OnMainWindowLock",
+              ButtonUncheck = "OnMainWindowLock",
+            },
+          },
+
+                    {
+            AnchorOffsets = { -350, 175, -25, 215 },
+            AnchorPoints = "TOPRIGHT",
+            RelativeToClient = true, 
+            Name = "MainWindowOpacitySliderFrame", 
+            IgnoreMouse = true, 
+            Children = {
+              {
+                AnchorOffsets = { 0, 7, 0, 27 },
+                AnchorPoints = "HFILL",
+                Class = "SliderBar", 
+                RelativeToClient = true, 
+                Template = "CRB_Scroll_HoloLarge", 
+                Name = "MainWindowOpacitySlider", 
+                DiscreteTicks = false, 
+                UseButtons = true, 
+                Min = 0.000000, 
+                Max = 100.000000, 
+                TickAmount = 1.000000, 
+                Middle = "CRB_Basekit:kitScrollbase_Horiz_Holo", 
+                Events = {
+                  SliderBarChanged = "OnMainWindowOpacitySliderBarChanged",
+                },
+              },
+              {
+                AnchorOffsets = { -46, 3, -4, -2 },
+                AnchorPoints = "VFILL",
+                RelativeToClient = true, 
+                Font = "CRB_InterfaceMedium", 
+                Text = 8888, 
+                Template = "CRB_NormalFramedThin", 
+                Name = "MainWindowOpacityEditBox", 
+                TextColor = "UI_WindowTextDefault", 
+                NoClip = true, 
+                DT_RIGHT = true, 
+                DT_VCENTER = true, 
+              },
+            },
+          },
+
+          {
+            AnchorOffsets = { -350, 215, -25, 245 },
+            AnchorPoints = "TOPRIGHT",
+            RelativeToClient = true, 
+            Name = "ArtWorkOpacitySliderFrame", 
+            IgnoreMouse = true, 
+            Children = {
+              {
+                AnchorOffsets = { 0, 7, 0, 27 },
+                AnchorPoints = "HFILL",
+                Class = "SliderBar", 
+                RelativeToClient = true, 
+                Template = "CRB_Scroll_HoloLarge", 
+                Name = "ArtWorkOpacitySlider", 
+                DiscreteTicks = false, 
+                UseButtons = true, 
+                Min = 0.000000, 
+                Max = 100.000000, 
+                TickAmount = 1.000000, 
+                Middle = "CRB_Basekit:kitScrollbase_Horiz_Holo", 
+                Events = {
+                  SliderBarChanged = "OnArtWorkOpacitySliderBarChanged",
+                },
+              },
+              {
+                AnchorOffsets = { -46, 3, -4, -2 },
+                AnchorPoints = "VFILL",
+                RelativeToClient = true, 
+                Font = "CRB_InterfaceMedium", 
+                Text = 8888, 
+                Template = "CRB_NormalFramedThin", 
+                Name = "ArtWorkOpacityEditBox", 
+                TextColor = "UI_WindowTextDefault", 
+                NoClip = true, 
+                DT_RIGHT = true, 
+                DT_VCENTER = true, 
+              },
+            },
+          },
+
+          {
             AnchorOffsets = { 0, 0, 0, -25 },
             AnchorPoints = "FILL",
             RelativeToClient = true, 
             Name = "BG_ShowWhen", 
             Sprite = "BK3:UI_BK3_Holo_InsetSimple", 
-            Picture = true, 
-            IgnoreMouse = true, 
-          },
-          {
-            AnchorOffsets = { 0, -15, 0, 0 },
-            AnchorPoints = "HFILLBOTTOM",
-            RelativeToClient = true, 
-            Name = "BG_ShowWhenDivider", 
-            Sprite = "BK3:UI_BK3_Holo_InsetDividerStripe", 
             Picture = true, 
             IgnoreMouse = true, 
           },
@@ -580,7 +684,7 @@ ktFormDefinitions = {
         IgnoreMouse = true, 
       },
       {
-        AnchorOffsets = { 0, 244, 0, 446 },
+        AnchorOffsets = { 0, 310, 0, 500 },
         AnchorPoints = "HFILL",
         RelativeToClient = true, 
         Name = "ShowHideFrame", 
@@ -787,25 +891,16 @@ ktFormDefinitions = {
               },
             },
           },
-          {
-            AnchorOffsets = { 60, -15, -60, 0 },
-            AnchorPoints = "HFILLBOTTOM",
-            RelativeToClient = true, 
-            Name = "BG_HideWhenDivider", 
-            Sprite = "BK3:UI_BK3_Holo_InsetDividerStripe", 
-            Picture = true, 
-            IgnoreMouse = true, 
-          },
         },
       },
       {
-        AnchorOffsets = { 0, 449, 0, 760 },
+        AnchorOffsets = { 0, 470, 0, 700 },
         AnchorPoints = "HFILL",
         RelativeToClient = true, 
         Name = "WarningsFrame", 
         Pixies = {
-          { AnchorOffsets = { 75, 150, 508, 186 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Threshold %", DT_VCENTER = true, },
-          { AnchorOffsets = { 75, 190, 508, 230 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Opacity %", DT_VCENTER = true, },
+          { AnchorOffsets = { 75, 100, 508, 110 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Threshold %", DT_VCENTER = true, },
+          { AnchorOffsets = { 75, 146, 508, 156 }, BGColor = "white", TextColor = "UI_TextHoloBodyHighlight", Font = "CRB_Interface10", Text = "Warning Opacity %", DT_VCENTER = true, },
         },
         Children = 
         {
@@ -886,7 +981,7 @@ ktFormDefinitions = {
             },
           },
           {
-            AnchorOffsets = { 70, 106, 270, 130 },
+            AnchorOffsets = { 250, 46, 440, 70 },
             Class = "Button", 
             Base = "BK3:btnHolo_Check", 
             Font = "CRB_InterfaceMedium", 
@@ -908,7 +1003,7 @@ ktFormDefinitions = {
             },
           },
           {
-            AnchorOffsets = { 70, 136, 270, 160 },
+            AnchorOffsets = { 250, 76, 440, 100 },
             Class = "Button", 
             Base = "BK3:btnHolo_Check", 
             Font = "CRB_InterfaceMedium", 
@@ -931,7 +1026,7 @@ ktFormDefinitions = {
           },
 
           {
-            AnchorOffsets = { -400, 176, -75, 208 },
+            AnchorOffsets = { -400, 116, -75, 146 },
             AnchorPoints = "TOPRIGHT",
             RelativeToClient = true, 
             Name = "WarningThresholdSliderFrame", 
@@ -969,13 +1064,8 @@ ktFormDefinitions = {
               },
             },
           },
-
-
-
-
-
           {
-            AnchorOffsets = { -400, 220, -75, 250 },
+            AnchorOffsets = { -400, 156, -75, 186 },
             AnchorPoints = "TOPRIGHT",
             RelativeToClient = true, 
             Name = "WarningOpacitySliderFrame", 
@@ -1013,10 +1103,6 @@ ktFormDefinitions = {
               },
             },
           },
-
-
-
-
         },
       },
     },
