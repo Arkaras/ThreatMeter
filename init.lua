@@ -1,4 +1,4 @@
-local VERSION = "0.8.1"
+local VERSION = "0.8.5"
 
 local ThreatMeter = Apollo.GetPackage("DaiAddon-1.0").tPackage:NewAddon("ThreatMeter", true, {})
 ThreatMeter.Version = VERSION
@@ -16,7 +16,7 @@ ThreatMeter.db = {
   fMainWindowOpacity          = 100,
   fArtWorkOpacity             = 100,
   bLockWarningWindow          = true,
-  bLockMainWindow             = true,
+  bLockMainWindow             = false,
   bShowWhenInGroup            = true,
   bShowWhenHavePet            = true,
   bShowWhenInRaid             = true,
