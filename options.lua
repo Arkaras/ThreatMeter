@@ -14,6 +14,7 @@ function ThreatMeter:ShowOptionsWindow()
 	self.wndOptions:FindChild("WarningOpacitySlider"):SetValue(self.db.fWarningOpacity)
 	self.wndOptions:FindChild("WarningOpacityEditBox"):SetText(string.format("%.0f", self.db.fWarningOpacity))
 	self.wndOptions:FindChild("HideWhenNotInCombat"):SetCheck(self.db.bHideWhenNotInCombat)
+	self.wndOptions:FindChild("HideWhenNotInCombat"):SetCheck(self.db.bHideWarningWhenNotInCombat)
 	self.wndOptions:FindChild("LockWindow"):SetCheck(self.db.bLockMainWindow)
 	self.wndOptions:FindChild("WarningLock"):SetCheck(self.db.bLockWarningWindow)
 	self.wndOptions:FindChild("MainWindowOpacitySlider"):SetValue(self.db.fMainWindowOpacity)
@@ -101,6 +102,11 @@ end
 
 function ThreatMeter:OnHideWhenNotInCombat( wndHandler, wndControl, eMouseButton )
 	self.db.bHideWhenNotInCombat = wndControl:IsChecked()
+	self:UpdateVisibility()
+end
+
+function ThreatMeter:OnHideWarningWhenNotInCombat( wndHandler, wndControl, eMouseButton )
+	self.db.bHideWarningWhenNotInCombat = wndControl:IsChecked()
 	self:UpdateVisibility()
 end
 

@@ -182,24 +182,28 @@ function ThreatMeter:OnClose( wndHandler, wndControl, eMouseButton )
 	self:Warn(false)
 end
 
+function ThreatMeter:MainWindow(bShow)
+  if self.db.bHideWhenNotInCombat and not self.bInCombat then
+    bShow = false
+  end
+    self.wndMain:Show(bShow)
+    self.wndMain:SetStyle("Moveable", not self.db.bLockMainWindow)
+    self.wndMain:SetStyle("IgnoreMouse", self.db.bLockMainWindow)
+    self.wndMain:SetOpacity(self.db.fMainWindowOpacity / 100)
+    self.wndMain:FindChild("Scanlines"):SetOpacity(self.db.fArtWorkOpacity / 100)
+    self.wndMain:FindChild("Crack"):SetOpacity(self.db.fArtWorkOpacity / 100)
+    self.wndMain:FindChild("ContainerArt"):SetOpacity(self.db.fArtWorkOpacity / 100)
+    self.wndMain:FindChild("BackgroundArtwork"):SetOpacity(self.db.fArtWorkOpacity / 100)
+    self.wndMain:FindChild("CloseButton"):SetOpacity(self.db.fArtWorkOpacity / 100)
+end
+
 function ThreatMeter:UpdateVisibility()
   local bShow = self:ShouldShow()
-  self.wndMain:Show(bShow)
-  self.wndMain:SetStyle("Moveable", not self.db.bLockMainWindow)
-  self.wndMain:SetOpacity(self.db.fMainWindowOpacity / 100)
-  self.wndMain:FindChild("Scanlines"):SetOpacity(self.db.fArtWorkOpacity / 100)
-  self.wndMain:FindChild("Crack"):SetOpacity(self.db.fArtWorkOpacity / 100)
-  self.wndMain:FindChild("ContainerArt"):SetOpacity(self.db.fArtWorkOpacity / 100)
-  self.wndMain:FindChild("BackgroundArtwork"):SetOpacity(self.db.fArtWorkOpacity / 100)
-  self.wndMain:FindChild("CloseButton"):SetOpacity(self.db.fArtWorkOpacity / 100)
+  self:MainWindow(bShow)
   self:Warn(bShow)
-
 end
 
 function ThreatMeter:ShouldShow()
-  if self.db.bHideWhenNotInCombat and not self.bInCombat then
-    return false
-  end
 
   local bInGroup = GroupLib.InGroup() and GroupLib.GetGroupMaxSize() <= 5
   local bInRaid  = GroupLib.InGroup() and GroupLib.GetGroupMaxSize() > 5
@@ -222,6 +226,11 @@ end
 -----------------------------------------------------------------------------------------------
 
 function ThreatMeter:Warn(bShow)
+
+  if self.db.bHideWarningWhenNotInCombat and not self.bInCombat then
+    bShow = false
+  end
+
   if bShow and self.db.bWarningUseMessage and not (self.db.bWarningTankDisable and InTankStance()) then
     if self.db.bWarningUseSound then
       Sound.Play(self.db.nWarningSoundId)
@@ -229,6 +238,7 @@ function ThreatMeter:Warn(bShow)
       self.wndWarning:Show(true)
       self.wndWarning:SetOpacity(self.db.fWarningOpacity / 100)
       self.wndWarning:SetStyle("Moveable", not self.db.bLockWarningWindow)
+      self.wndWarning:SetStyle("IgnoreMouse", self.db.bLockWarningWindow)
   else
     self.wndWarning:Show(false)
   end
