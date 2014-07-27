@@ -2,14 +2,14 @@
 -- Client Lua Script for ThreatMeter
 -- @author daihenka
 -----------------------------------------------------------------------------------------------
- 
+
 require "Apollo"
 require "Window"
 require "GameLib"
 require "GroupLib"
 require "Sound"
 require "MatchingGame"
- 
+
 -----------------------------------------------------------------------------------------------
 -- ThreatMeter Module Definitions
 -----------------------------------------------------------------------------------------------
@@ -46,9 +46,9 @@ local function FormatBigNumber(nArg, nPrecision)
   if type(nArg) == "string" then
     nArg = tonumber(nArg)
   end
-  
+
 	nPrecision = nPrecision or 1
-	
+
 	-- Turns 99999 into 99k and 90000 into 90k
 	if nArg < 1000 then
 		return nArg
@@ -69,13 +69,15 @@ function ThreatMeter:OnInitialize()
   -- slash commands
   Apollo.RegisterSlashCommand("threat",      "OnSlashCmd", self)
   Apollo.RegisterSlashCommand("threatmeter", "OnSlashCmd", self)
-  
+
   -- Register handlers for events
   Apollo.RegisterEventHandler("TargetedByUnit",           "OnTargetedByUnit",           self)
   Apollo.RegisterEventHandler("UnTargetedByUnit",         "OnUntargetedByUnit",         self)
   Apollo.RegisterEventHandler("TargetThreatListUpdated",  "OnTargetThreatListUpdated",  self)
   Apollo.RegisterEventHandler("UnitEnteredCombat",        "OnUnitEnteredCombat",        self)
-  
+  Apollo.RegisterEventHandler("InterfaceMenuListHasLoaded", "OnInterfaceMenuListHasLoaded", self)
+  Apollo.RegisterEventHandler("ShowOptionsMenuInterface", "ShowOptionsWindow", self)
+
   self.tItems                = {}
   self.tDisplayOrder         = {}
   self.bInCombat             = false
@@ -87,11 +89,11 @@ function ThreatMeter:OnInitialize()
   self.LastMobId             = nil
   self.fLastThreatPct        = 0
 
-  
+
   self.wndMain    = self:CreateMainWindow()
   self.wndWarning = self:CreateWarningWindow()
   self.wndItemList = self.wndMain:FindChild("ItemList")
-  
+
   Apollo.LoadSprites("ColorPickerSprites.xml", "ColorPickerSprites")
 end
 
@@ -113,13 +115,13 @@ function ThreatMeter:OnSaveSettings(eLevel)
   if eLevel ~= GameLib.CodeEnumAddonSaveLevel.Character then
     return
   end
-	
+
   local tData = DaiUtil.TableCopy(self.db)
   tData.Version = CONFIG_VERSION
   tData.tAnchorOffsets = {self.wndMain:GetAnchorOffsets()}
-  tData.TWarningOffsets = {self.wndWarning:GetAnchorOffsets()} 
+  tData.TWarningOffsets = {self.wndWarning:GetAnchorOffsets()}
   DaiUtil.SerializeColors(tData)
-  
+
   return tData
 end
 
@@ -130,12 +132,12 @@ function ThreatMeter:OnRestoreSettings(eLevel, tData)
   if eLevel ~= GameLib.CodeEnumAddonSaveLevel.Character then
     return
   end
-  
+
   if (tData.Version or 0) < CONFIG_VERSION then
     -- discard old versions of the config as they are incompatible
     return
   end
-  
+
   DaiUtil.DeserializeColors(tData)
 
   if type(tData.tAnchorOffsets) == "table" and #tData.tAnchorOffsets == 4 then
@@ -153,7 +155,10 @@ function ThreatMeter:OnRestoreSettings(eLevel, tData)
   self:UpdateVisibility()
 end
 
-
+function ThreatMeter:OnInterfaceMenuListHasLoaded()
+  Event_FireGenericEvent("InterfaceMenuList_NewAddOn", "ThreatMeter", {"ShowOptionsMenuInterface", "", ""})
+  --self:UpdateInterfaceMenuAlerts()
+end
 -----------------------------------------------------------------------------------------------
 -- ThreatMeter Slash
 -----------------------------------------------------------------------------------------------
@@ -193,7 +198,7 @@ end
 
 function ThreatMeter:ShouldShow()
   if self.db.bHideWhenNotInCombat and not self.bInCombat then
-    return false 
+    return false
   end
 
   local bInGroup = GroupLib.InGroup() and GroupLib.GetGroupMaxSize() <= 5
@@ -204,10 +209,10 @@ function ThreatMeter:ShouldShow()
                 (self.db.bShowWhenInGroup and bInGroup) or
                 (self.db.bShowWhenInRaid and bInRaid) or
                 (self.db.bShowWhenAlone and not bInGroup and not bInRaid and not bHasPet)
-				
+
 	-- check if we are in instanced PvP
-	if self.db.bHideWhenInPvP and MatchingGame.IsInPVPGame() then 
-    bShow = false 
+	if self.db.bHideWhenInPvP and MatchingGame.IsInPVPGame() then
+    bShow = false
   end
 	return bShow
 end
@@ -223,7 +228,7 @@ function ThreatMeter:Warn(bShow)
     end
       self.wndWarning:Show(true)
       self.wndWarning:SetOpacity(self.db.fWarningOpacity / 100)
-      self.wndWarning:SetStyle("Moveable", not self.db.bLockWarningWindow) 
+      self.wndWarning:SetStyle("Moveable", not self.db.bLockWarningWindow)
   else
     self.wndWarning:Show(false)
   end
@@ -236,7 +241,7 @@ end
 -- warning is on.
 function ThreatMeter:UpdateWarningStatus(nMyThreat, nTopThreat)
 	local fMyThreatPct = nMyThreat / nTopThreat * 100
-  
+
 	if (fMyThreatPct < self.db.fWarningThreshold) or (self.db.bWarningTankDisable and InTankStance()) then
     self:Warn(false)
 	elseif self.fLastThreatPct < self.db.fWarningThreshold and self:ShouldShow() and #self.tItems > 1 then
@@ -268,7 +273,7 @@ function ThreatMeter:AddThreatUnit(tStore, unit, nThreatAmount)
 		elseif self.tGroupData[unit:GetId()] ~= nil then
 			color = self.db.crGroupMember
 		end
-		
+
 		if unit:GetUnitOwner() ~= nil then
 			if GameLib.GetPlayerUnit() == unit:GetUnitOwner() then
 				color = self.db.crPlayerPet
@@ -299,20 +304,20 @@ function ThreatMeter:OnTargetThreatListUpdated(...)
 		local nTopThreat = select(2, ...)
 		self:UpdateGroupData()
 		self:UpdateVisibility()
-		
+
 		-- update threat data store
 		local tThreat = {}
 		for i=1, select('#', ...), 2 do
 			local unitData = self:AddThreatUnit(tThreat, select(i, ...), select(i+1, ...))
-			
+
 			if unitData and unitData.luaUnit == GameLib.GetPlayerUnit() then
 				self:UpdateWarningStatus(unitData.nAmount, nTopThreat)
 			end
 		end
-		
+
 		tinsert(self.tThreatStore, tThreat)
 		tinsert(self.tThreatStoreTime, ostime())
-		
+
 		self:UpdateTPS()
 		self:UpdateDisplay(tThreat)
 	end
@@ -322,7 +327,7 @@ function ThreatMeter:UpdateGroupData()
 	self.tGroupData = {}
 	for idx = 1, GroupLib.GetGroupMaxSize() do
 		local tMember = GroupLib.GetUnitForGroupMember(idx)
-		if tMember == nil then 
+		if tMember == nil then
       break
     end
 		self.tGroupData[tMember:GetId()] = true
@@ -336,14 +341,14 @@ function ThreatMeter:UpdateTPS()
 		tremove(self.tThreatStore, 1)
 		tremove(self.tThreatStoreTime, 1)
 	end
-	
+
 	local nDataSize = #self.tThreatStoreTime
 	if nDataSize == 0 or nStartTime <= self.tThreatStoreTime[1] then
 		-- we don't have enough data
 		self.tThreatPerSecond = nil
 		return
 	end
-	
+
 	self.tThreatPerSecond = {}
 	if nDataSize == 1 then
 		for i = 1, #self.tThreatStore[1] do
@@ -351,21 +356,21 @@ function ThreatMeter:UpdateTPS()
 		end
 		return
 	end
-	
+
 	for i = 1, #self.tThreatStore[nDataSize] do
 		local idx = self.tThreatStore[nDataSize][i].nId
-		
+
 		local nBaseThreat = self:GetThreatAmount(self.tThreatStore[1], idx)
 		local nSecondThreat = self:GetThreatAmount(self.tThreatStore[2], idx)
 		local nFinalThreat = self:GetThreatAmount(self.tThreatStore[nDataSize], idx)
-		
+
 		if nBaseThreat and nSecondThreat and nFinalThreat then
 			local fRatio = (nStartTime - self.tThreatStoreTime[1]) / (self.tThreatStoreTime[2] - self.tThreatStoreTime[1])
 			local startThreat = (nSecondThreat - nBaseThreat) * fRatio + nBaseThreat
 			self.tThreatPerSecond[idx] = (nFinalThreat - startThreat) / self.db.nTPSWindow
 		else
 			self.tThreatPerSecond[idx] = 0
-		end		
+		end
 	end
 end
 
@@ -421,7 +426,7 @@ end
 
 function ThreatMeter:DisplayList(tListing)
 	tsort(tListing, function(a,b) return a.nAmount > b.nAmount end)
-	
+
 	local bArrange = false
 	for k,tUnitData in ipairs(tListing) do
 		if not self.tItems[k] then
@@ -439,12 +444,12 @@ function ThreatMeter:DisplayList(tListing)
 		if self.tThreatPerSecond then
 			strTps = strformat("%.2f", self.tThreatPerSecond[tUnitData.nId])
 		end
-		
+
 		wnd.amountText:SetText(strformat("%s (%.0f)", FormatBigNumber(tUnitData.nAmount, self.db.bThreatTotalPrecision and 3 or 1), tUnitData.nAmount / tListing[1].nAmount * 100))
 		wnd.tpsText:SetText(strTps)
-		wnd.progressBar:SetProgress(tUnitData.nAmount / tListing[1].nAmount)		
+		wnd.progressBar:SetProgress(tUnitData.nAmount / tListing[1].nAmount)
 	end
-	
+
 	-- trim
 	if #self.tItems > #tListing then
 		for i=#tListing+1, #self.tItems do
@@ -452,7 +457,7 @@ function ThreatMeter:DisplayList(tListing)
 			self.tItems[i] = nil
 		end
 	end
-	
+
 	-- rearrange
 	if bArrange then
 		self.wndItemList:ArrangeChildrenVert()
@@ -491,6 +496,6 @@ function ThreatMeter:DestroyItemList()
 	for idx,wnd in ipairs(self.tItems) do
 		wnd:Destroy()
 	end
-	
+
 	self.tItems = {}
 end
